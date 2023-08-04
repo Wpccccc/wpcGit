@@ -1,23 +1,33 @@
 package com.sky.service.impl;
 
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.Result;
 import com.sky.service.EmployeeService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
+
 
     /**
      * 员工登录
@@ -55,4 +65,40 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+
+    /**
+     * 新增员工
+     * @param employeeDTO
+     * @return
+     */
+
+    public Result save(EmployeeDTO employeeDTO){
+        //判断用户名是否已存在
+        if (employeeMapper.getByUsername(employeeDTO.getUsername()) != null){
+            return Result.error("账号‘"+employeeDTO.getUsername()+"'"+MessageConstant.ALREADY_EXIST);
+        }
+        //创建一个employee对象
+        Employee employee = new Employee();
+
+        //将employeeDTO中的属性拷贝到employee中
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        //set其余属性
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+        employee.setStatus(StatusConstant.ENABLE);
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+
+        //动态获取当前登录用户的id
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        //调用mapper的insert方法
+       if (employeeMapper.insert(employee) > 0){
+              return Result.success();
+       }else {
+           return Result.error("新增失败");
+       }
+    }
 }
