@@ -29,4 +29,12 @@ public interface EmployeeService {
      * @return
      */
     PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 修改员工账号状态
+     * @param status 账号状态
+     * @param id 员工id
+     * @return
+     */
+    Result switchStatus(Integer status, Long id);
 }

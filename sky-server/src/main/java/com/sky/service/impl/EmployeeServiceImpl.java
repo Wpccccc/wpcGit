@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
@@ -123,5 +124,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         queryWrapper.orderByAsc("id");
         IPage selectPage = employeeMapper.selectPage(page,queryWrapper);
         return new PageResult(selectPage.getTotal(),selectPage.getRecords());
+    }
+
+    /**
+     * 修改员工账号状态
+     * @param status 账号状态
+     * @param id 员工id
+     * @return
+     */
+    public Result switchStatus(Integer status, Long id) {
+        if (BaseContext.getCurrentId() != 1){
+            return Result.error("您没有权限修改账号状态");
+        }
+
+        UpdateWrapper updateWrapper = new UpdateWrapper();
+        updateWrapper.eq("id",id);
+        updateWrapper.set("status",status);
+        updateWrapper.set("update_time",LocalDateTime.now());
+        updateWrapper.set("update_user",BaseContext.getCurrentId());
+        if (employeeMapper.update(null,updateWrapper) > 0) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
+        }
     }
 }
