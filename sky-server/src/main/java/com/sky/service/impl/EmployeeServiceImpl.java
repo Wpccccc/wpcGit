@@ -1,16 +1,21 @@
 package com.sky.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import io.swagger.annotations.ApiOperation;
@@ -18,9 +23,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -100,5 +107,21 @@ public class EmployeeServiceImpl implements EmployeeService {
        }else {
            return Result.error("新增失败");
        }
+    }
+
+    /**
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        //根据页码和每页显示条数创建一个分页对象
+        IPage page = new Page(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        //根据姓名模糊查询
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.like(StringUtils.hasText(employeePageQueryDTO.getName()),"name",employeePageQueryDTO.getName());
+        queryWrapper.orderByAsc("id");
+        IPage selectPage = employeeMapper.selectPage(page,queryWrapper);
+        return new PageResult(selectPage.getTotal(),selectPage.getRecords());
     }
 }
