@@ -134,6 +134,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     public Result switchStatus(Integer status, Long id) {
         if (BaseContext.getCurrentId() != 1){
+//            throw new RuntimeException("您没有权限修改账号状态");
             return Result.error("您没有权限修改账号状态");
         }
 
@@ -143,6 +144,40 @@ public class EmployeeServiceImpl implements EmployeeService {
         updateWrapper.set("update_time",LocalDateTime.now());
         updateWrapper.set("update_user",BaseContext.getCurrentId());
         if (employeeMapper.update(null,updateWrapper) > 0) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
+        }
+    }
+
+    /**
+     * 根据员工id查询员工信息
+     * @param id 员工id
+     * @return
+     */
+    public Result getEmployeeById(Long id) {
+        Employee employee = employeeMapper.selectById(id);
+        //对密码进行脱敏处理
+        employee.setPassword("******");
+        if (employee != null) {
+            return Result.success(employee);
+        } else {
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
+        }
+    }
+
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     * @return
+     */
+    public Result updateEmployeeInfo(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        if (employeeMapper.updateById(employee) > 0) {
             return Result.success();
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
