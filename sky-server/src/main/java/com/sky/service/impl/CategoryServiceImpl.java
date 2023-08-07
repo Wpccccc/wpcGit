@@ -74,6 +74,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    /**
+     * 修改分类状态
+     * @param status 分类状态
+     * @param id 分类id
+     * @return
+     */
     public Result switchStatus(Integer status, Long id) {
         if (BaseContext.getCurrentId() != 1){
 //            throw new RuntimeException("您没有权限修改账号状态");
@@ -86,6 +92,23 @@ public class CategoryServiceImpl implements CategoryService {
         updateWrapper.set("update_time",LocalDateTime.now());
         updateWrapper.set("update_user",BaseContext.getCurrentId());
         if (categoryMapper.update(null,updateWrapper) > 0) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
+        }
+    }
+
+    /**
+     * 删除分类
+     * @param id
+     * @return
+     */
+    public Result deleteCategory(Long id) {
+        if (BaseContext.getCurrentId() != 1){
+            return Result.error("您没有权限删除分类");
+        }
+        if (categoryMapper.deleteById(id) > 0) {
+            commonUtil.resetSort();
             return Result.success();
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);

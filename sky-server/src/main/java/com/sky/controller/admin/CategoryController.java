@@ -52,4 +52,12 @@ public class CategoryController {
         Result result = categoryService.switchStatus(status, id);
         return result;
     }
+
+    @ApiOperation(value = "删除分类")
+    @DeleteMapping
+    public Result deleteCategory(Long id){
+        log.info("删除分类：{}", id);
+        Result result = categoryService.deleteCategory(id);
+        return result;
+    }
 }

@@ -31,4 +31,11 @@ public interface CategoryService {
      * @return
      */
     Result switchStatus(Integer status, Long id);
+
+    /**
+     * 删除分类
+     * @param id
+     * @return
+     */
+    Result deleteCategory(Long id);
 }
