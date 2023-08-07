@@ -38,4 +38,11 @@ public interface CategoryService {
      * @return
      */
     Result deleteCategory(Long id);
+
+    /**
+     * 更新分类信息
+     * @param categoryDTO
+     * @return
+     */
+    Result updateCategory(CategoryDTO categoryDTO);
 }

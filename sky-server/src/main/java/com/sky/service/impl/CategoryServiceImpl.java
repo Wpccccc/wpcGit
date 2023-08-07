@@ -114,4 +114,22 @@ public class CategoryServiceImpl implements CategoryService {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
     }
+
+    /**
+     * 更新分类信息
+     * @param categoryDTO
+     * @return
+     */
+    public Result updateCategory(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO, category);
+        category.setUpdateTime(LocalDateTime.now());
+        category.setUpdateUser(BaseContext.getCurrentId());
+        if (categoryMapper.updateById(category) > 0) {
+            commonUtil.resetSort();
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
+        }
+    }
 }

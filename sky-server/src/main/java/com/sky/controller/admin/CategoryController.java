@@ -60,4 +60,12 @@ public class CategoryController {
         Result result = categoryService.deleteCategory(id);
         return result;
     }
+
+    @ApiOperation(value = "更新分类信息")
+    @PutMapping
+    public Result updateCategory(@RequestBody CategoryDTO categoryDTO){
+        log.info("更新分类：{}", categoryDTO);
+        Result result = categoryService.updateCategory(categoryDTO);
+        return result;
+    }
 }
