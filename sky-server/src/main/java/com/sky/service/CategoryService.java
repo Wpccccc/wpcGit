@@ -23,4 +23,12 @@ public interface CategoryService {
      * @return
      */
     Result saveCategory(CategoryDTO categoryDTO);
+
+    /**
+     * 修改分类状态
+     * @param status 分类状态
+     * @param id 分类id
+     * @return
+     */
+    Result switchStatus(Integer status, Long id);
 }

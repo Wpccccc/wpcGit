@@ -1,8 +1,10 @@
 package com.sky.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
@@ -69,6 +71,24 @@ public class CategoryServiceImpl implements CategoryService {
         }
         catch (Exception e){
             return Result.error("新增失败");
+        }
+    }
+
+    public Result switchStatus(Integer status, Long id) {
+        if (BaseContext.getCurrentId() != 1){
+//            throw new RuntimeException("您没有权限修改账号状态");
+            return Result.error("您没有权限修改分类状态");
+        }
+
+        UpdateWrapper updateWrapper = new UpdateWrapper();
+        updateWrapper.eq("id",id);
+        updateWrapper.set("status",status);
+        updateWrapper.set("update_time",LocalDateTime.now());
+        updateWrapper.set("update_user",BaseContext.getCurrentId());
+        if (categoryMapper.update(null,updateWrapper) > 0) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
     }
 }

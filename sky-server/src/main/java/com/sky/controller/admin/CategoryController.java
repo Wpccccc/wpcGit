@@ -44,4 +44,12 @@ public class CategoryController {
         log.info("新增分类:{}",categoryDTO);
         return categoryService.saveCategory(categoryDTO);
     }
+
+    @ApiOperation(value = "变更分类状态")
+    @PostMapping("/status/{status}")
+    public Result switchStatus(@PathVariable Integer status, Long id){
+        log.info("变更分类状态：{}，{}", status, id);
+        Result result = categoryService.switchStatus(status, id);
+        return result;
+    }
 }
