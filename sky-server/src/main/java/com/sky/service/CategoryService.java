@@ -45,4 +45,11 @@ public interface CategoryService {
      * @return
      */
     Result updateCategory(CategoryDTO categoryDTO);
+
+    /**
+     * 根据分类类型查询分类列表
+     * @param type
+     * @return
+     */
+    Result listCategoryByType(Integer type);
 }

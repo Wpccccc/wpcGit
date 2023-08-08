@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author wpc
@@ -131,5 +132,15 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * 根据分类类型查询分类
+     * @param type
+     * @return
+     */
+    public Result listCategoryByType(Integer type) {
+        List<Category> categoryList = categoryMapper.selectList(new QueryWrapper<Category>().eq("type", type));
+        return Result.success(categoryList);
     }
 }

@@ -1,4 +1,9 @@
 sky:
+  cos:
+    region: cos.ap-shanghai
+    secret-id: AKIDeBYhdLohW8MYv9HDvTr33r8VlGbmmZ9W
+    secret-key: azPflpurkX8XjkcKq9KK5iDSUIwQjqjS
+    bucket-name: my-bucket-1318181529
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost

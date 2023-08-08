@@ -30,6 +30,12 @@ logging:
         controller: info
 
 sky:
+  cos:
+    region: ${sky.cos.region}
+    secret-id: ${sky.cos.secret-id}
+    secret-key: ${sky.cos.secret-key}
+    bucket-name: ${sky.cos.bucket-name}
+    key-name: ${sky.cos.key-name}
   jwt:
     # 设置jwt签名加密时使用的秘钥
     admin-secret-key: itcast

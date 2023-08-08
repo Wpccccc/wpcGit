@@ -68,4 +68,12 @@ public class CategoryController {
         Result result = categoryService.updateCategory(categoryDTO);
         return result;
     }
+
+    @ApiOperation(value = "根据类型查询分类")
+    @GetMapping("/list")
+    public Result listCategoryByType(Integer type){
+        log.info("根据类型查询分类：{}", type);
+        Result result = categoryService.listCategoryByType(type);
+        return result;
+    }
 }
