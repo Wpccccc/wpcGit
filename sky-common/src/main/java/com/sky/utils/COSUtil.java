@@ -128,27 +128,6 @@ public class COSUtil {
     }
 
 
-    public String  getObjectUrl(){
-        // 不需要验证身份信息
-        COSCredentials cred = new AnonymousCOSCredentials();
-
-        // ClientConfig 中包含了后续请求 COS 的客户端设置：
-        ClientConfig clientConfig = new ClientConfig();
-
-        // 设置 bucket 的地域
-        clientConfig.setRegion(new Region(cosProperties.getRegion()));
-
-        // 设置生成的 url 的请求协议, http 或者 https
-        clientConfig.setHttpProtocol(HttpProtocol.https);
-
-        // 生成cos客户端
-        COSClient cosClient = new COSClient(cred, clientConfig);
-
-        String url = String.valueOf(cosClient.getObjectUrl(cosProperties.getBucketName(), "key"));
-        System.out.println(url);
-        return url;
-    }
-
     public File bytesToFile(byte[] bytes,String fileName) {
         BufferedOutputStream bos = null;
         FileOutputStream fos = null;
