@@ -94,13 +94,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         //set其余属性
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
         employee.setStatus(StatusConstant.ENABLE);
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
-
-        //动态获取当前登录用户的id
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
+//
+//
+//        //动态获取当前登录用户的id
+//        employee.setCreateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         //调用mapper的insert方法
        if (employeeMapper.insert(employee) > 0){
@@ -141,8 +141,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         UpdateWrapper updateWrapper = new UpdateWrapper();
         updateWrapper.eq("id",id);
         updateWrapper.set("status",status);
-        updateWrapper.set("update_time",LocalDateTime.now());
-        updateWrapper.set("update_user",BaseContext.getCurrentId());
+//        updateWrapper.set("update_time",LocalDateTime.now());
+//        updateWrapper.set("update_user",BaseContext.getCurrentId());
         if (employeeMapper.update(null,updateWrapper) > 0) {
             return Result.success();
         } else {
@@ -175,8 +175,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Result updateEmployeeInfo(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
         if (employeeMapper.updateById(employee) > 0) {
             return Result.success();
         } else {
