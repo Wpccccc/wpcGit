@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -170,6 +171,24 @@ public class DishServiceImpl implements DishService {
             return Result.success("修改菜品成功");
         } else {
             return Result.error("修改菜品失败");
+        }
+    }
+
+
+    /**
+     * 批量删除菜品
+     * @param ids 菜品id
+     * @return
+     */
+    public Result bulkDeleteDish(String ids) {
+        if (dishMapper.deleteBatchIds(Arrays.asList(ids.split(","))) <= 0) {
+            return Result.error("批量删除菜品失败");
+        } else {
+            if (dishFlavorMapper.delete(new UpdateWrapper<DishFlavor>().in("dish_id", Arrays.asList(ids.split(",")))) <= 0) {
+                return Result.error("批量删除菜品口味失败");
+            } else {
+                return Result.success("批量删除菜品成功");
+            }
         }
     }
 }

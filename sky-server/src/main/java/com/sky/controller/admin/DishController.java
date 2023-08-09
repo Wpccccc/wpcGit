@@ -66,4 +66,11 @@ public class DishController {
         log.info("修改菜品：{}", dishDTO);
         return dishService.updateDish(dishDTO);
     }
+
+    @ApiOperation("批量删除菜品")
+    @DeleteMapping
+    public Result bulkDeleteDish(String ids){
+        log.info("批量删除菜品：{}", ids);
+        return dishService.bulkDeleteDish(ids);
+    }
 }

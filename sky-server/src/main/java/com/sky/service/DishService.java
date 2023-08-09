@@ -54,4 +54,12 @@ public interface DishService {
      * @return
      */
     Result updateDish(DishDTO dishDTO);
+
+
+    /**
+     * 批量删除菜品
+     * @param ids
+     * @return
+     */
+    Result bulkDeleteDish(String ids);
 }
