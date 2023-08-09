@@ -2,6 +2,7 @@ package com.sky.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.sky.context.BaseContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 
 @Component
+@Slf4j
 public class MyMetaObjectHandler implements MetaObjectHandler {
 
     /**
@@ -29,7 +31,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     }
 
     public boolean isExclude(MetaObject metaObject){
-        System.out.println(metaObject.getOriginalObject().getClass().getName());
         if(excludeClasses != null && excludeClasses.size() > 0){
             Object originalObject = metaObject.getOriginalObject();
             for(String cls : excludeClasses){
@@ -52,6 +53,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         if (isExclude(metaObject)) {
             return;
         }
+        log.info("开始自动填充...");
         this.setFieldValByName("createTime", LocalDateTime.now(), metaObject);
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         this.setFieldValByName("createUser", BaseContext.getCurrentId(), metaObject);
@@ -64,6 +66,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         if (isExclude(metaObject)) {
             return;
         }
+        log.info("开始自动填充...");
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         this.setFieldValByName("updateUser", BaseContext.getCurrentId(), metaObject);
 

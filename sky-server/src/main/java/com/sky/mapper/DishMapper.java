@@ -1,7 +1,10 @@
 package com.sky.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.sky.entity.Dish;
+import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -12,11 +15,4 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
 
-    /**
-     * 根据菜品名称查询菜品
-     * @param name
-     * @return
-     */
-    @Select("select * from dish where name = #{name}")
-    Dish getByName(String name);
 }

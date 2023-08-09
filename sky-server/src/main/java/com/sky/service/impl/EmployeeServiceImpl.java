@@ -137,13 +137,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            throw new RuntimeException("您没有权限修改账号状态");
             return Result.error("您没有权限修改账号状态");
         }
-
-        UpdateWrapper updateWrapper = new UpdateWrapper();
-        updateWrapper.eq("id",id);
-        updateWrapper.set("status",status);
+        Employee employee = new Employee();
+        employee.setId(id);
+        employee.setStatus(status);
 //        updateWrapper.set("update_time",LocalDateTime.now());
 //        updateWrapper.set("update_user",BaseContext.getCurrentId());
-        if (employeeMapper.update(null,updateWrapper) > 0) {
+        if (employeeMapper.updateById(employee) > 0) {
             return Result.success();
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
