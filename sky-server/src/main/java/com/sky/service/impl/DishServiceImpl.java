@@ -121,4 +121,55 @@ public class DishServiceImpl implements DishService {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
     }
+
+    /**
+     * 根据分类id查询菜品列表
+     * @param categoryId 菜品id
+     * @return
+     */
+    public Result getDishListByCategoryId(Long categoryId) {
+        List<Dish> dishList = dishMapper.selectList(new QueryWrapper<Dish>().eq("category_id", categoryId));
+        return Result.success(dishList);
+    }
+
+    /**
+     * 根据id查询菜品
+     * @param id 菜品id
+     * @return
+     */
+    public DishVO getDishById(Long id) {
+        Dish dish = dishMapper.selectById(id);
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setCategoryName(categoryMapper.selectById(dish.getCategoryId()).getName());
+        dishVO.setFlavors(dishFlavorMapper.selectList(new QueryWrapper<DishFlavor>().eq("dish_id", dish.getId())));
+        return dishVO;
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDTO
+     * @return
+     */
+    public Result updateDish(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        if (dishMapper.updateById(dish) > 0) {
+            //删除原有口味
+            dishFlavorMapper.delete(new UpdateWrapper<DishFlavor>().eq("dish_id", dish.getId()));
+            //新增新的口味
+            List<DishFlavor> flavors = dishDTO.getFlavors();
+            if (flavors != null && flavors.size() > 0) {
+                for (DishFlavor flavor : flavors) {
+                    flavor.setDishId(dish.getId());
+                    if ( dishFlavorMapper.insert(flavor) <= 0) {
+                        return Result.error("新增口味失败");
+                    }
+                }
+            }
+            return Result.success("修改菜品成功");
+        } else {
+            return Result.error("修改菜品失败");
+        }
+    }
 }
