@@ -39,4 +39,33 @@ public class SetmealController {
         log.info("新增套餐:{}",setmealDTO);
         return setmealService.saveWithDishes(setmealDTO);
     }
+
+    @ApiOperation(value = "根据id查询套餐")
+    @GetMapping("/{id}")
+    public Result getSetmealById(@PathVariable Long id){
+        log.info("根据id查询套餐:{}",id);
+        return setmealService.getSetmealById(id);
+    }
+
+    @ApiOperation(value = "修改套餐售卖状态")
+    @PostMapping("/status/{status}")
+    public Result switchStatus(@PathVariable Integer status, Long id){
+        log.info("修改套餐售卖状态:{},{}",status,id);
+        return setmealService.switchStatus(status,id);
+    }
+
+    @ApiOperation(value = "修改套餐")
+    @PutMapping
+    public Result updateSetmeal(@RequestBody SetmealDTO setmealDTO){
+        log.info("修改套餐:{}",setmealDTO);
+        return setmealService.updateSetmeal(setmealDTO);
+    }
+
+
+    @ApiOperation(value = "删除套餐")
+    @DeleteMapping
+    public Result deleteSetmeal(String ids){
+        log.info("删除套餐:{}",ids);
+        return setmealService.deleteSetmeal(ids);
+    }
 }

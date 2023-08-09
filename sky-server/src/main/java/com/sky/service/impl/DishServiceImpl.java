@@ -180,7 +180,7 @@ public class DishServiceImpl implements DishService {
      * @param ids 菜品id
      * @return
      */
-    public Result bulkDeleteDish(String ids) {
+    public Result deleteDish(String ids) {
         if (dishMapper.deleteBatchIds(Arrays.asList(ids.split(","))) <= 0) {
             return Result.error("批量删除菜品失败");
         } else {

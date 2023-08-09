@@ -24,4 +24,33 @@ public interface SetmealService {
      * @return
      */
     Result saveWithDishes(SetmealDTO setmealDTO);
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    Result getSetmealById(Long id);
+
+    /**
+     * 修改套餐售卖状态
+     * @param status
+     * @param id
+     * @return
+     */
+    Result switchStatus(Integer status, Long id);
+
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     * @return
+     */
+    Result updateSetmeal(SetmealDTO setmealDTO);
+
+    /**
+     * 删除套餐
+     * @param ids
+     * @return
+     */
+    Result deleteSetmeal(String ids);
 }

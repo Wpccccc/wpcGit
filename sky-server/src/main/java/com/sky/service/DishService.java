@@ -61,5 +61,5 @@ public interface DishService {
      * @param ids
      * @return
      */
-    Result bulkDeleteDish(String ids);
+    Result deleteDish(String ids);
 }
