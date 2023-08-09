@@ -87,8 +87,8 @@ public class DishServiceImpl implements DishService {
         queryWrapper.eq(dishPageQueryDTO.getCategoryId()!=null,"category_id",dishPageQueryDTO.getCategoryId());
         //根据菜品名称模糊查询
         queryWrapper.like(StringUtils.hasText(dishPageQueryDTO.getName()), "name", dishPageQueryDTO.getName());
-        //根据菜品id升序排序
-        queryWrapper.orderByAsc("id");
+        //根据更新时间降序
+        queryWrapper.orderByDesc("update_time");
 
         IPage<Dish> dishIPage = dishMapper.selectPage(page, queryWrapper);
         List<Dish> dishList = dishIPage.getRecords();
