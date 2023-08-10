@@ -19,7 +19,7 @@ public class CosConfig {
     @Bean
     @ConditionalOnMissingBean
     public COSUtil cosUtil(CosProperties cosProperties) {
-        log.info("开始创建腾讯云文件上传对象:{}", cosProperties);
+        log.info("已读取腾讯云对象存储配置:{}", cosProperties);
         return new COSUtil(cosProperties);
     }
 }
