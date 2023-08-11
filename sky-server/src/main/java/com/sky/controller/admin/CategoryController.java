@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 分类管理
  */
-@RestController
+@RestController("adminCategoryController")
 @RequestMapping("/admin/category")
 @Slf4j
 @Api(tags = "分类管理")

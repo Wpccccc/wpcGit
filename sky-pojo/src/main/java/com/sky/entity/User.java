@@ -43,6 +43,5 @@ public class User implements Serializable {
     private String avatar;
 
     //注册时间
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

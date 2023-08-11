@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Dish;
@@ -12,11 +13,13 @@ import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
@@ -43,6 +46,9 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 分页查询
@@ -183,4 +189,44 @@ public class SetmealServiceImpl implements SetmealService {
             }
         }
     }
+
+    /**
+     * 根据套餐id查询所含菜品
+     * @param id
+     * @return
+     */
+    public Result getDishListBySetmealId(Long id) {
+        List<DishItemVO> dishItemVOList = new ArrayList<>();
+        List<SetmealDish> setmealDishes = setmealDishMapper.selectList(new QueryWrapper<SetmealDish>().eq("setmeal_id", id));
+        if (setmealDishes != null && setmealDishes.size() > 0) {
+            for (SetmealDish setmealDish : setmealDishes) {
+                DishItemVO dishItemVO = new DishItemVO();
+                Dish dish = dishMapper.selectById(setmealDish.getDishId());
+                BeanUtils.copyProperties(dish, dishItemVO);
+                dishItemVO.setCopies(setmealDish.getCopies());
+                dishItemVOList.add(dishItemVO);
+            }
+            return Result.success(dishItemVOList);
+        } else {
+            return Result.error("查询套餐所含菜品失败");
+        }
+    }
+
+    /**
+     * 根据分类id查询套餐
+     * @param categoryId
+     * @return
+     */
+    public Result getSetmealByCategoryId(Long categoryId) {
+        List<Setmeal> setmeals = setmealMapper.selectList(new QueryWrapper<Setmeal>()
+                .eq("category_id", categoryId)
+                .eq("status", StatusConstant.ENABLE));
+        if (setmeals != null && setmeals.size() > 0) {
+            return Result.success(setmeals);
+        } else {
+            return Result.error("查询套餐失败");
+        }
+    }
+
+
 }

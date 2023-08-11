@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2023/8/9 15:59
  */
 
-@RestController
+@RestController("adminSetmealController")
 @RequestMapping("/admin/setmeal")
 @Slf4j
 @Api(tags = "套餐管理")

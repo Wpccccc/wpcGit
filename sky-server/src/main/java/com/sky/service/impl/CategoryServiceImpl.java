@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
@@ -140,7 +141,9 @@ public class CategoryServiceImpl implements CategoryService {
      * @return
      */
     public Result listCategoryByType(Integer type) {
-        List<Category> categoryList = categoryMapper.selectList(new QueryWrapper<Category>().eq("type", type));
+        List<Category> categoryList = categoryMapper.selectList(new QueryWrapper<Category>()
+                .eq(type != null ,"type", type)
+                .eq("status", StatusConstant.ENABLE));
         return Result.success(categoryList);
     }
 }

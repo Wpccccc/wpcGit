@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
@@ -189,6 +190,30 @@ public class DishServiceImpl implements DishService {
             } else {
                 return Result.success("批量删除菜品成功");
             }
+        }
+    }
+
+    /**
+     * 根据分类id查询菜品及对应口味
+     * @param categoryId
+     * @return
+     */
+    public Result getDishWithFlavorListByCategoryId(Long categoryId) {
+        List<Dish> dishList = dishMapper.selectList(new QueryWrapper<Dish>()
+                .eq("category_id", categoryId)
+                .eq("status", StatusConstant.ENABLE));
+        List<DishVO> dishVOList = new ArrayList<>();
+        dishList.forEach(dish -> {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish, dishVO);
+            dishVO.setFlavors(dishFlavorMapper.selectList(new QueryWrapper<DishFlavor>().eq("dish_id", dish.getId())));
+            dishVO.setCategoryName(categoryMapper.selectById(dish.getCategoryId()).getName());
+            dishVOList.add(dishVO);
+        });
+        if (dishVOList.size() > 0) {
+            return Result.success(dishVOList);
+        } else {
+            return Result.error("该分类下没有菜品");
         }
     }
 }

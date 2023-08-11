@@ -53,4 +53,18 @@ public interface SetmealService {
      * @return
      */
     Result deleteSetmeal(String ids);
+
+    /**
+     * 根据套餐id查询所含菜品
+     * @param id
+     * @return
+     */
+    Result getDishListBySetmealId(Long id);
+
+    /**
+     * 根据分类id查询套餐
+     * @param categoryId
+     * @return
+     */
+    Result getSetmealByCategoryId(Long categoryId);
 }
