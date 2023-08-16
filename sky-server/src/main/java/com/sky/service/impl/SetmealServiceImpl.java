@@ -19,17 +19,23 @@ import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import com.sky.utils.CommonUtil;
 import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author wpc
@@ -50,6 +56,11 @@ public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private DishMapper dishMapper;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private CommonUtil commonUtil;
     /**
      * 分页查询
      * @param setmealPageQueryDTO
@@ -135,11 +146,13 @@ public class SetmealServiceImpl implements SetmealService {
      * @param id
      * @return
      */
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result switchStatus(Integer status, Long id) {
         Setmeal setmeal = new Setmeal();
         setmeal.setId(id);
         setmeal.setStatus(status);
         if (setmealMapper.updateById(setmeal) > 0) {
+
             return Result.success();
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
@@ -151,6 +164,10 @@ public class SetmealServiceImpl implements SetmealService {
      * @param setmealDTO
      * @return
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "setmealCache", allEntries = true),
+            @CacheEvict(cacheNames = "setmealDishCache", key = "#setmealDTO.id")
+    })
     public Result updateSetmeal(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
@@ -178,6 +195,10 @@ public class SetmealServiceImpl implements SetmealService {
      * @param ids
      * @return
      */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "setmealCache", allEntries = true),
+            @CacheEvict(cacheNames = "setmealDishCache", allEntries = true)
+    })
     public Result deleteSetmeal(String ids) {
         if (setmealMapper.deleteBatchIds(Arrays.asList(ids.split(","))) <= 0) {
             return Result.error("批量删除套餐失败");
@@ -191,10 +212,12 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     /**
+     * 用户端
      * 根据套餐id查询所含菜品
      * @param id
      * @return
      */
+    @Cacheable(cacheNames = "setmealDishCache", key = "#id")
     public Result getDishListBySetmealId(Long id) {
         List<DishItemVO> dishItemVOList = new ArrayList<>();
         List<SetmealDish> setmealDishes = setmealDishMapper.selectList(new QueryWrapper<SetmealDish>().eq("setmeal_id", id));
@@ -213,15 +236,31 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     /**
+     * 用户端
      * 根据分类id查询套餐
      * @param categoryId
      * @return
      */
+    @Cacheable(cacheNames = "setmealCache", key = "#categoryId")
     public Result getSetmealByCategoryId(Long categoryId) {
+
+//        //构建缓存key
+//        String key = "setmeal_" + categoryId;
+//
+//        //查询缓存中是否存在该key对应的数据
+//        List<Setmeal> setmealList = (List<Setmeal>) redisTemplate.opsForValue().get(key);
+//
+//        //如果存在数据，则直接返回
+//        if (setmealList != null && setmealList.size() > 0){
+//            return Result.success(setmealList);
+//        }
+//
+//        //如果不存在，则从数据库读取数据并缓存
         List<Setmeal> setmeals = setmealMapper.selectList(new QueryWrapper<Setmeal>()
                 .eq("category_id", categoryId)
                 .eq("status", StatusConstant.ENABLE));
         if (setmeals != null && setmeals.size() > 0) {
+//            redisTemplate.opsForValue().set(key,setmeals);
             return Result.success(setmeals);
         } else {
             return Result.error("查询套餐失败");
