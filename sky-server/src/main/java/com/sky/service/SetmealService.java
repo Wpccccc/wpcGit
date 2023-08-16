@@ -55,6 +55,7 @@ public interface SetmealService {
     Result deleteSetmeal(String ids);
 
     /**
+     * 用户端
      * 根据套餐id查询所含菜品
      * @param id
      * @return
@@ -62,6 +63,7 @@ public interface SetmealService {
     Result getDishListBySetmealId(Long id);
 
     /**
+     * 用户端
      * 根据分类id查询套餐
      * @param categoryId
      * @return

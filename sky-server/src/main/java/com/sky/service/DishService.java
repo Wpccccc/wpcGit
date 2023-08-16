@@ -65,6 +65,7 @@ public interface DishService {
     Result deleteDish(String ids);
 
     /**
+     * 用户端
      * 根据分类id查询菜品
      * @param categoryId
      * @return

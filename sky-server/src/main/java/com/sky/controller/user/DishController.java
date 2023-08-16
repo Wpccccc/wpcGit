@@ -29,6 +29,7 @@ public class DishController {
     @GetMapping("/list")
     public Result getDishListByCategoryId(Long categoryId) {
         log.info("根据分类id查询菜品：{}", categoryId);
+
         return dishService.getDishWithFlavorListByCategoryId(categoryId);
     }
 }

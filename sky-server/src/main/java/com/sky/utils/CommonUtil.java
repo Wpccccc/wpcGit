@@ -3,11 +3,15 @@ package com.sky.utils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sky.entity.Category;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author wpc
@@ -18,6 +22,8 @@ import java.util.List;
 public class CommonUtil {
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 重置排序
@@ -43,4 +49,21 @@ public class CommonUtil {
 
     }
 
+    /**
+     * 根据菜品id获取分类id
+     * @param ids
+     * @return
+     */
+    public Set getCategoryIdByDishId(String ids){
+        //根据菜品id查询分类id
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("category_id");
+        queryWrapper.in("id", Arrays.asList(ids.split(",")));
+        List<HashMap<String, Object>> maps = dishMapper.selectMaps(queryWrapper);
+        //获取分类id,并添加前缀"dish_"后保存到Set返回
+        Set categoryIds = maps.stream().map(map -> "dish_" + map.get("category_id")).collect(Collectors.toSet());
+
+        return categoryIds;
+
+    }
 }

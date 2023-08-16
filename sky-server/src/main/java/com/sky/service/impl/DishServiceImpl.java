@@ -17,10 +17,12 @@ import com.sky.mapper.DishMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import com.sky.utils.CommonUtil;
 import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -28,6 +30,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author wpc
@@ -39,6 +42,8 @@ import java.util.List;
 public class DishServiceImpl implements DishService {
 
     @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
     private DishMapper dishMapper;
 
     @Autowired
@@ -46,6 +51,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     /**
      * 新增菜品及对应口味
@@ -113,11 +121,14 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     public Result switchStatus(Integer status, Long id) {
-
         Dish dish = new Dish();
         dish.setStatus(status);
         dish.setId(id);
         if (dishMapper.updateById(dish) > 0) {
+            // 清空该菜品所在分类对应的缓存
+            Set categoryIdByDishId = commonUtil.getCategoryIdByDishId(id+"");
+            redisTemplate.delete(categoryIdByDishId);
+
             return Result.success();
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
@@ -154,6 +165,9 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     public Result updateDish(DishDTO dishDTO) {
+        String originalCategoryId = dishMapper.selectById(dishDTO.getId()).getCategoryId().toString();
+        boolean isChangeCategory = !originalCategoryId.equals(dishDTO.getCategoryId().toString());
+
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
         if (dishMapper.updateById(dish) > 0) {
@@ -169,6 +183,18 @@ public class DishServiceImpl implements DishService {
                     }
                 }
             }
+            //清空该key对应的缓存
+            String newKey = "dish_" + dish.getCategoryId();
+            if (isChangeCategory) {
+                System.out.println("修改了分类");
+                String oldKey = "dish_" + originalCategoryId;
+                redisTemplate.delete(newKey);
+                redisTemplate.delete(oldKey);
+            } else {
+                System.out.println("没有修改分类");
+                redisTemplate.delete(newKey);
+            }
+
             return Result.success("修改菜品成功");
         } else {
             return Result.error("修改菜品失败");
@@ -182,23 +208,41 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     public Result deleteDish(String ids) {
+        Set categoryIdByDishId = commonUtil.getCategoryIdByDishId(ids);
         if (dishMapper.deleteBatchIds(Arrays.asList(ids.split(","))) <= 0) {
             return Result.error("批量删除菜品失败");
         } else {
             if (dishFlavorMapper.delete(new UpdateWrapper<DishFlavor>().in("dish_id", Arrays.asList(ids.split(",")))) <= 0) {
                 return Result.error("批量删除菜品口味失败");
             } else {
+                //清空对应的缓存
+                redisTemplate.delete(categoryIdByDishId);
+
                 return Result.success("批量删除菜品成功");
             }
         }
     }
 
     /**
+     * 用户端
      * 根据分类id查询菜品及对应口味
      * @param categoryId
      * @return
      */
     public Result getDishWithFlavorListByCategoryId(Long categoryId) {
+
+        //构建Redis中缓存数据的key，格式为：dish_1
+        String key = "dish_" + categoryId;
+
+        //查询Redis中是否存在该key
+        List<DishVO> redisDishVOList = (List<DishVO>) redisTemplate.opsForValue().get(key);
+
+        //如果存在，直接返回
+        if (redisDishVOList != null && redisDishVOList.size() > 0) {
+            return Result.success(redisDishVOList);
+        }
+
+        //如果不存在，查询数据库
         List<Dish> dishList = dishMapper.selectList(new QueryWrapper<Dish>()
                 .eq("category_id", categoryId)
                 .eq("status", StatusConstant.ENABLE));
@@ -211,6 +255,8 @@ public class DishServiceImpl implements DishService {
             dishVOList.add(dishVO);
         });
         if (dishVOList.size() > 0) {
+            //将查询到的数据存入Redis中
+            redisTemplate.opsForValue().set(key, dishVOList);
             return Result.success(dishVOList);
         } else {
             return Result.error("该分类下没有菜品");
