@@ -219,7 +219,14 @@ public class DishServiceImpl implements DishService {
                 dishName.append(setmealDish.getName()).append(",");
             });
             dishName.deleteCharAt(dishName.length()-1);
-            return Result.error("删除失败，菜品"+dishName+"已被套餐使用");
+            return Result.error("菜品"+dishName+MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+        //判断要删除的菜品是否为启售状态，如果是，则不可删除
+        List<Dish> dishList = dishMapper.selectBatchIds(Arrays.asList(ids.split(",")));
+        for (Dish dish : dishList) {
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                return Result.error(dish.getName()+MessageConstant.DISH_ON_SALE);
+            }
         }
 
         Set categoryIdByDishId = commonUtil.getCategoryIdByDishId(ids);

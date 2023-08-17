@@ -198,6 +198,14 @@ public class SetmealServiceImpl implements SetmealService {
             @CacheEvict(cacheNames = "setmealDishCache", allEntries = true)
     })
     public Result deleteSetmeal(String ids) {
+        //判断要删除的套餐是否为启售状态，如果是，则不可删除
+        List<Setmeal> setmeals = setmealMapper.selectBatchIds(Arrays.asList(ids.split(",")));
+        for (Setmeal setmeal : setmeals) {
+            if (setmeal.getStatus() == 1) {
+                return Result.error(setmeal.getName()+MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+
         if (setmealMapper.deleteBatchIds(Arrays.asList(ids.split(","))) <= 0) {
             return Result.error("批量删除套餐失败");
         } else {

@@ -10,7 +10,11 @@ import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
+import com.sky.entity.Dish;
+import com.sky.entity.Setmeal;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
@@ -33,6 +37,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     @Autowired
     private CommonUtil commonUtil;
@@ -106,6 +116,17 @@ public class CategoryServiceImpl implements CategoryService {
      * @return
      */
     public Result deleteCategory(Long id) {
+        // 判断当前分类下是否有商品或套餐，有则不能删除
+        List<Dish> dishList = dishMapper.selectList(new QueryWrapper<Dish>().eq("category_id", id));
+        if (dishList.size() > 0){
+            return Result.error(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
+        }
+        List<Setmeal> setmealList = setmealMapper.selectList(new QueryWrapper<Setmeal>().eq("category_id", id));
+        if (setmealList.size() > 0){
+            return Result.error(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
+        }
+
+        //权限审核
         if (BaseContext.getCurrentId() != 1){
             return Result.error("您没有权限删除分类");
         }
