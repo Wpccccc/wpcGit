@@ -40,4 +40,18 @@ public class ShopCartController {
         log.info("添加购物车：{}", shopingCartDTO);
         return shoppingCartService.addShoppingCart(shopingCartDTO);
     }
+
+    @ApiOperation("删除购物车中的一个物品")
+    @PostMapping("/sub")
+    public Result subShoppingCart(@RequestBody ShoppingCartDTO shopingCartDTO){
+        log.info("删除购物车中的一个物品：{}", shopingCartDTO);
+        return shoppingCartService.subShoppingCart(shopingCartDTO);
+    }
+
+    @ApiOperation("清空购物车")
+    @DeleteMapping("/clean")
+    public Result cleanShoppingCart(){
+        log.info("清空购物车");
+        return shoppingCartService.cleanShoppingCart();
+    }
 }

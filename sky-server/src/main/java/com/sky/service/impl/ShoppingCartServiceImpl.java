@@ -104,4 +104,58 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             return Result.success("添加成功");
         }
     }
+
+
+
+    /**
+     * 删除购物车中的一个物品
+     * @param shoppingCartDTO
+     * @return
+     */
+    public Result subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        //根据菜品id或者套餐id和用户id查询购物车中的商品
+        Long dishId = shoppingCartDTO.getDishId();
+        Long setmealId = shoppingCartDTO.getSetmealId();
+        Long userId = BaseContext.getCurrentId();
+
+        //设置查询条件
+        QueryWrapper<ShoppingCart> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq(dishId != null, "dish_id", dishId);
+        queryWrapper.eq(setmealId != null, "setmeal_id", setmealId);
+        queryWrapper.eq(StringUtils.hasText(shoppingCartDTO.getDishFlavor()), "dish_flavor", shoppingCartDTO.getDishFlavor());
+        ShoppingCart shoppingCart = shoppingCartMapper.selectOne(queryWrapper);
+
+        //如果购物车中的数量大于1，则减少数量
+        if (shoppingCart.getNumber() > 1){
+            shoppingCart.setNumber(shoppingCart.getNumber() - 1);
+            shoppingCartMapper.updateById(shoppingCart);
+            return Result.success("删除成功");
+        } else {
+            //如果购物车中的数量等于1，则删除该商品
+            shoppingCartMapper.deleteById(shoppingCart.getId());
+            return Result.success("删除成功");
+        }
+
+    }
+
+    /**
+     * 清空购物车
+     * @return
+     */
+    public Result cleanShoppingCart() {
+        //动态获取当前登录用户的id
+        Long userId = BaseContext.getCurrentId();
+
+        //根据用户id删除购物车中的所有商品
+        QueryWrapper<ShoppingCart> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+
+        if (shoppingCartMapper.delete(queryWrapper) > 0){
+            return Result.success("清空成功");
+        } else {
+            return Result.error("清空失败");
+        }
+    }
+
 }

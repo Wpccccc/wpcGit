@@ -23,4 +23,16 @@ public interface ShoppingCartService {
      * @return
      */
     Result addShoppingCart(ShoppingCartDTO shoppingCartDTO);
+
+    /**
+     * 删除购物车中的一个物品
+     * @return
+     */
+    Result subShoppingCart(ShoppingCartDTO shoppingCartDTO);
+
+    /**
+     * 清空购物车
+     * @return
+     */
+    Result cleanShoppingCart();
 }
