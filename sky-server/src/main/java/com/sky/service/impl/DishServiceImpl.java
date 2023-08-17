@@ -6,14 +6,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
-import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
-import com.sky.mapper.CategoryMapper;
-import com.sky.mapper.DishFlavorMapper;
-import com.sky.mapper.DishMapper;
+import com.sky.entity.SetmealDish;
+import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -51,6 +49,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     @Autowired
     private CommonUtil commonUtil;
@@ -208,6 +209,19 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     public Result deleteDish(String ids) {
+        //在套餐菜品表中查询是否包含要删除的菜品
+        List<SetmealDish> setMealDishList = setmealDishMapper.selectList(new QueryWrapper<SetmealDish>().in("dish_id", Arrays.asList(ids.split(","))));
+        if (setMealDishList != null && setMealDishList.size() > 0) {
+            //如果包含，则提示不可删除，需要先删除该套餐才能删除
+            //拼接菜品名
+            StringBuilder dishName = new StringBuilder();
+            setMealDishList.forEach(setmealDish -> {
+                dishName.append(setmealDish.getName()).append(",");
+            });
+            dishName.deleteCharAt(dishName.length()-1);
+            return Result.error("删除失败，菜品"+dishName+"已被套餐使用");
+        }
+
         Set categoryIdByDishId = commonUtil.getCategoryIdByDishId(ids);
         if (dishMapper.deleteBatchIds(Arrays.asList(ids.split(","))) <= 0) {
             return Result.error("批量删除菜品失败");

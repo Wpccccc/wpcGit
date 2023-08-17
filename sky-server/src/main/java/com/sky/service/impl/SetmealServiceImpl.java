@@ -59,8 +59,6 @@ public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private CommonUtil commonUtil;
     /**
      * 分页查询
      * @param setmealPageQueryDTO
