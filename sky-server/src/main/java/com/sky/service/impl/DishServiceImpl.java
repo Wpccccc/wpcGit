@@ -165,6 +165,7 @@ public class DishServiceImpl implements DishService {
      * @param dishDTO
      * @return
      */
+    @Transactional
     public Result updateDish(DishDTO dishDTO) {
         String originalCategoryId = dishMapper.selectById(dishDTO.getId()).getCategoryId().toString();
         boolean isChangeCategory = !originalCategoryId.equals(dishDTO.getCategoryId().toString());
@@ -208,6 +209,7 @@ public class DishServiceImpl implements DishService {
      * @param ids 菜品id
      * @return
      */
+    @Transactional
     public Result deleteDish(String ids) {
         //在套餐菜品表中查询是否包含要删除的菜品
         List<SetmealDish> setMealDishList = setmealDishMapper.selectList(new QueryWrapper<SetmealDish>().in("dish_id", Arrays.asList(ids.split(","))));

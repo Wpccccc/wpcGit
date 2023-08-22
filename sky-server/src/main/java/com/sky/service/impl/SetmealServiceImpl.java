@@ -30,6 +30,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ public class SetmealServiceImpl implements SetmealService {
      * @param setmealDTO
      * @return
      */
+    @Transactional
     public Result saveWithDishes(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
@@ -162,6 +164,7 @@ public class SetmealServiceImpl implements SetmealService {
      * @param setmealDTO
      * @return
      */
+    @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "setmealCache", allEntries = true),
             @CacheEvict(cacheNames = "setmealDishCache", key = "#setmealDTO.id")
@@ -193,6 +196,7 @@ public class SetmealServiceImpl implements SetmealService {
      * @param ids
      * @return
      */
+    @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "setmealCache", allEntries = true),
             @CacheEvict(cacheNames = "setmealDishCache", allEntries = true)

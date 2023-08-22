@@ -147,6 +147,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         //动态获取当前登录用户的id
         Long userId = BaseContext.getCurrentId();
 
+        //查询购物车是否为空，为空则直接返回对应信息
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.selectList(new QueryWrapper<ShoppingCart>().eq("user_id", userId));
+        if (shoppingCartList.size() == 0){
+            return Result.success("购物车为空");
+        }
         //根据用户id删除购物车中的所有商品
         QueryWrapper<ShoppingCart> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
