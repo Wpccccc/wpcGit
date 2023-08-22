@@ -33,7 +33,7 @@ public class OrderTask {
         //1.查询超时且未付款订单
         QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Orders.PENDING_PAYMENT);
-        queryWrapper.le("order_time", LocalDateTime.now().minusMinutes(1));
+        queryWrapper.le("order_time", LocalDateTime.now().minusMinutes(15));
         List<Orders> ordersList = ordersMapper.selectList(queryWrapper);
 
         //2.修改订单状态为已取消
@@ -53,7 +53,7 @@ public class OrderTask {
     /**
      * 处理一直在配送中的订单
      */
-    @Scheduled(cron = "0 53 9 * * ?") //每天凌晨5点执行
+    @Scheduled(cron = "0 0 5 * * ?") //每天凌晨5点执行
     public void processDeliveryOrder() {
         log.info("定时任务：处理一直在配送中的订单  {}", LocalDateTime.now());
 

@@ -5,13 +5,13 @@ import com.sky.entity.Category;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +28,7 @@ public class CommonUtil {
 
     @Autowired
     private SetmealMapper setmealMapper;
+
     /**
      * 重置排序
      */
@@ -54,8 +55,8 @@ public class CommonUtil {
 
     /**
      * 根据菜品id获取分类id
-     * @param ids
-     * @return
+     * @param ids 菜品id串
+     * @return 分类id集合
      */
     public Set getCategoryIdByDishId(String ids){
         //根据菜品id查询分类id
@@ -72,8 +73,8 @@ public class CommonUtil {
 
     /**
      * 根据套餐id获取分类id
-     * @param ids
-     * @return
+     * @param ids 套餐id串
+     * @return 分类id集合
      */
     public Set getCategoryIdBySetmealId(String ids){
         //根据套餐id查询分类id
@@ -86,5 +87,21 @@ public class CommonUtil {
 
         return categoryIds;
 
+    }
+
+    /**
+     * 根据起始时间和结束时间获取日期列表,以yyyy-MM-dd格式返回
+     * @param begin 起始时间
+     * @param end 结束时间
+     * @return 日期列表
+     */
+    public List<LocalDate> getDateList(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = new ArrayList<>();
+        dateList.add(begin);
+        while (begin.isBefore(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+        return dateList;
     }
 }
