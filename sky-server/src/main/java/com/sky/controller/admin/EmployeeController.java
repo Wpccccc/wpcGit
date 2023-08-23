@@ -1,9 +1,11 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
@@ -36,9 +38,8 @@ public class EmployeeController {
 
     /**
      * 登录
-     *
-     * @param employeeLoginDTO
-     * @return
+     * @param employeeLoginDTO 员工登录信息
+     * @return 员工登录信息
      */
 
     @ApiOperation(value = "员工登录")
@@ -125,5 +126,13 @@ public class EmployeeController {
         log.info("修改员工信息：{}", employeeDTO);
         Result result = employeeService.updateEmployeeInfo(employeeDTO);
         return result;
+    }
+
+    @ApiOperation(value = "修改密码")
+    @PutMapping("/editPassword")
+    public Result<Object> editPassword(@RequestBody PasswordEditDTO passwordEditDTO){
+        log.info("修改密码：{}", passwordEditDTO);
+        passwordEditDTO.setEmpId(BaseContext.getCurrentId());
+        return employeeService.editPassword(passwordEditDTO);
     }
 }

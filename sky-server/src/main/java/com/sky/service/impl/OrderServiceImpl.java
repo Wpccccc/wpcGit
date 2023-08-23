@@ -431,9 +431,9 @@ public class OrderServiceImpl implements OrderService {
 
         IPage<Orders> ordersIPage = ordersMapper.selectPage(iPage, queryWrapper);
 
-        if (ordersIPage.getTotal() == 0) {
-            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
-        }
+//        if (ordersIPage.getTotal() == 0) {
+//            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+//        }
         //封装VO对象返回结果
         List<Orders> ordersList = ordersIPage.getRecords();
         List<OrderVO> orderVOList = new ArrayList<>();
